@@ -1,10 +1,10 @@
-import { StatusBar, StyleSheet, View, Text } from "react-native"
+import { StatusBar, StyleSheet, View, Text, Image } from "react-native"
 import { useFonts } from "expo-font"
-import { Stack } from "expo-router"
+import { Slot, Stack } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { useEffect } from "react"
 import "react-native-reanimated"
-import App from "./indexapp"
+import App from "./index"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -24,19 +24,8 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={style.app}>
-      <StatusBar barStyle={"light-content"} />
-      <App />
-    </View>
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+    </Stack>
   )
 }
-
-const style = StyleSheet.create({
-  app: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "gray",
-  },
-})
