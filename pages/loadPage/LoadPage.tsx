@@ -1,14 +1,35 @@
 import { ThemedText } from "@/components/ThemedText"
-import { Link } from "expo-router"
+import { Link } from "react-router-native"
 import { useEffect, useState } from "react"
-import { StyleSheet, View, Text, Image, Alert } from "react-native"
+import { View, Image, Alert } from "react-native"
 import * as Location from "expo-location"
 import { LinearGradient } from "expo-linear-gradient"
-import { StatusBar } from "expo-status-bar"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { LOCAL_JWT, LOCAL_LOGIN } from "@/store/constants"
+import { styles } from "./styles.loadpage"
 
-export default function App() {
+export default function LoadPage() {
   const [location, setLocation] = useState<Location.LocationObjectCoords>()
   const [errorMsg, setErrorMsg] = useState("")
+  const [locallStoreLogin, setlocallStoreLogin] = useState("")
+  const [locallStoreJWT, setlocallStoreJWT] = useState("")
+
+  const locallStoreGetData = async () => {
+    try {
+      const login = await AsyncStorage.getItem(LOCAL_LOGIN)
+      const jwt = await AsyncStorage.getItem(LOCAL_JWT)
+      if (login !== null && jwt !== null) {
+        setlocallStoreLogin(login)
+        setlocallStoreJWT(jwt)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    locallStoreGetData()
+  }, [])
 
   const getLocation = async () => {
     try {
@@ -40,12 +61,6 @@ export default function App() {
       colors={["rgba(0, 98, 128, 0.719)", "transparent", "rgba(0,0,0,0.8)"]}
       style={styles.container}
     >
-      <StatusBar style="inverted" />
-      <Image
-        source={require("@/assets/images/fonfish.jpg")}
-        style={styles.maifon}
-      />
-
       <View style={styles.appLogoBox}>
         <Image
           source={require("@/assets/images/logoMf-01.png")}
@@ -65,59 +80,21 @@ export default function App() {
           </View>
         )}
         <View style={styles.linkFoLogin}>
-          <Link style={styles.linkFoLoginText} href="/loginpage">
-            LOGIN
-          </Link>
-          <Link style={styles.linkFoLoginText} href="./pizzatest">
-            PIZZA
-          </Link>
+          {!locallStoreLogin && !locallStoreJWT ? (
+            <Link to="/login">
+              <ThemedText type="subtitle" style={styles.linkFoLoginText}>
+                ВХІД
+              </ThemedText>
+            </Link>
+          ) : (
+            <Link to="/startpage">
+              <ThemedText type="subtitle" style={styles.linkFoLoginText}>
+                ВХІД
+              </ThemedText>
+            </Link>
+          )}
         </View>
       </View>
     </LinearGradient>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 5,
-    padding: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-  },
-  colorWhite: {
-    color: "white",
-    textAlign: "center",
-  },
-  linkFoLogin: {
-    width: 120,
-    height: 50,
-  },
-  linkFoLoginText: {
-    textAlign: "center",
-    color: "#8accdd",
-  },
-  contentbox: {
-    flex: 1,
-  },
-  appLogoBox: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  appLogo: {
-    height: 108,
-    width: 200,
-    bottom: 0,
-    position: "absolute",
-  },
-  maifon: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    zIndex: -1,
-  },
-})
