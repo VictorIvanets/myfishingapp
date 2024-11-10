@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react"
 import { TextInput, View, Image, Pressable } from "react-native"
 import { useNavigate } from "react-router-native"
 import { getlogin } from "./authGet"
-import { locallStoreSetData } from "./authLocallStorage"
 import { styles } from "./styles.loginpage"
+import { userActions } from "@/store/login.slice"
+import { useDispatch } from "react-redux"
+import { AppDispath } from "@/store/store"
 
 export default function LoginPage() {
   const [loginInput, setLoginInput] = useState("")
@@ -13,6 +15,8 @@ export default function LoginPage() {
   const [viewLabelLogin, setViewLabelLogin] = useState(true)
   const [viewLabelPass, setViewLabelPass] = useState(true)
   const [errorAuth, setErrorAuth] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useDispatch<AppDispath>()
 
   const navigate = useNavigate()
 
@@ -39,10 +43,22 @@ export default function LoginPage() {
     } else if (passwordInput.length < 3) {
       setValidInput("пароль повинен бути не менше 3х символів")
     } else {
+      setIsLoading(true)
       const data = await getlogin(loginInput, passwordInput)
-      if (data.message) setErrorAuth(data.message)
-      else {
-        locallStoreSetData(data.login, data.userId, data.access_token)
+
+      if (data.message) {
+        setErrorAuth(data.message)
+        setIsLoading(false)
+      } else {
+        console.log(data.login, data.userId)
+        dispatch(
+          userActions.login({
+            login: data.login,
+            userId: data.userId,
+            jwt: data.access_token,
+          })
+        )
+        setIsLoading(false)
         setLoginInput("")
         setPasswordInput("")
         navigate("/startpage")
@@ -58,60 +74,70 @@ export default function LoginPage() {
           style={styles.appLogo}
         />
       </View>
-      <View style={styles.submitbox}>
-        <View style={styles.buttonboxback}>
-          <Pressable onPress={() => navigate("/")}>
-            <ThemedText style={styles.colorWhite}>BACK</ThemedText>
+      {!isLoading ? (
+        <View style={styles.submitbox}>
+          <View style={styles.buttonboxback}>
+            <Pressable onPress={() => navigate("/")}>
+              <ThemedText style={styles.colorWhite}>BACK</ThemedText>
+            </Pressable>
+          </View>
+          {validInput ? (
+            <ThemedText style={styles.colorWhite} type="default">
+              {validInput}
+            </ThemedText>
+          ) : errorAuth ? (
+            <ThemedText style={styles.colorWhite} type="default">
+              {errorAuth}
+            </ThemedText>
+          ) : (
+            <ThemedText style={styles.colorWhite} type="default"></ThemedText>
+          )}
+
+          <View style={styles.inputpass}>
+            <TextInput
+              style={styles.input}
+              onChangeText={(t) => {
+                setLoginInput(t)
+              }}
+              value={loginInput}
+            />
+            <View style={styles.inputBottoLine}></View>
+            <ThemedText
+              style={
+                viewLabelLogin ? styles.inputLabel : styles.inputLabelActiv
+              }
+              type="subtitlelite"
+            >
+              login
+            </ThemedText>
+          </View>
+
+          <View style={styles.inputpass}>
+            <TextInput
+              style={styles.input}
+              onChangeText={(t) => setPasswordInput(t)}
+              value={passwordInput}
+            />
+            <View style={styles.inputBottoLine}></View>
+
+            <ThemedText
+              style={viewLabelPass ? styles.inputLabel : styles.inputLabelActiv}
+              type="subtitlelite"
+            >
+              password
+            </ThemedText>
+          </View>
+          <Pressable style={styles.buttonbox} onPress={onSubmit}>
+            <ThemedText style={styles.colorWhite}>ВХІД</ThemedText>
           </Pressable>
         </View>
-        {validInput ? (
-          <ThemedText style={styles.colorWhite} type="default">
-            {validInput}
-          </ThemedText>
-        ) : errorAuth ? (
-          <ThemedText style={styles.colorWhite} type="default">
-            {errorAuth}
-          </ThemedText>
-        ) : (
-          <ThemedText style={styles.colorWhite} type="default"></ThemedText>
-        )}
-
-        <View style={styles.inputpass}>
-          <TextInput
-            style={styles.input}
-            onChangeText={(t) => {
-              setLoginInput(t)
-            }}
-            value={loginInput}
-          />
-          <View style={styles.inputBottoLine}></View>
-          <ThemedText
-            style={viewLabelLogin ? styles.inputLabel : styles.inputLabelActiv}
-            type="subtitlelite"
-          >
-            login
+      ) : (
+        <View style={styles.loading}>
+          <ThemedText type="title" style={styles.colorWhite}>
+            LOAD...
           </ThemedText>
         </View>
-
-        <View style={styles.inputpass}>
-          <TextInput
-            style={styles.input}
-            onChangeText={(t) => setPasswordInput(t)}
-            value={passwordInput}
-          />
-          <View style={styles.inputBottoLine}></View>
-
-          <ThemedText
-            style={viewLabelPass ? styles.inputLabel : styles.inputLabelActiv}
-            type="subtitlelite"
-          >
-            password
-          </ThemedText>
-        </View>
-        <Pressable style={styles.buttonbox} onPress={onSubmit}>
-          <ThemedText style={styles.colorWhite}>ВХІД</ThemedText>
-        </Pressable>
-      </View>
+      )}
     </View>
   )
 }

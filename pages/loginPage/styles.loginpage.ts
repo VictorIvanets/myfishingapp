@@ -19,6 +19,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 40,
   },
+  loading: {
+    width: "100%",
+    flex: 2,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingTop: 40,
+  },
   backbox: {
     flex: 1,
   },

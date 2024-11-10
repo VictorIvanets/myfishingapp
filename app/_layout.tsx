@@ -7,6 +7,8 @@ import "react-native-reanimated"
 import App from "../pages/loadPage/LoadPage"
 import { NativeRouter } from "react-router-native"
 import { RoutesView } from "./routes"
+import { Provider } from "react-redux"
+import { store } from "@/store/store"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -36,14 +38,16 @@ export default function RootLayout() {
         source={require("@/assets/images/fonfish.jpg")}
         style={styles.maifon}
       />
-      <NativeRouter
-        future={{
-          v7_relativeSplatPath: true,
-          v7_startTransition: true,
-        }}
-      >
-        <RoutesView />
-      </NativeRouter>
+      <Provider store={store}>
+        <NativeRouter
+          future={{
+            v7_relativeSplatPath: true,
+            v7_startTransition: true,
+          }}
+        >
+          <RoutesView />
+        </NativeRouter>
+      </Provider>
     </View>
   )
 }

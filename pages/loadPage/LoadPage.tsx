@@ -5,22 +5,35 @@ import { View, Image, Alert } from "react-native"
 import * as Location from "expo-location"
 import { LinearGradient } from "expo-linear-gradient"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { LOCAL_JWT, LOCAL_LOGIN } from "@/store/constants"
+import { LOCAL_JWT, LOCAL_LOGIN, LOCAL_USERID } from "@/store/constants"
 import { styles } from "./styles.loadpage"
+import { useDispatch } from "react-redux"
+import { AppDispath } from "@/store/store"
+import { userActions } from "@/store/login.slice"
 
 export default function LoadPage() {
   const [location, setLocation] = useState<Location.LocationObjectCoords>()
   const [errorMsg, setErrorMsg] = useState("")
   const [locallStoreLogin, setlocallStoreLogin] = useState("")
   const [locallStoreJWT, setlocallStoreJWT] = useState("")
+  const dispatch = useDispatch<AppDispath>()
 
   const locallStoreGetData = async () => {
     try {
       const login = await AsyncStorage.getItem(LOCAL_LOGIN)
       const jwt = await AsyncStorage.getItem(LOCAL_JWT)
-      if (login !== null && jwt !== null) {
+      const iserId = await AsyncStorage.getItem(LOCAL_USERID)
+      if (login !== null && jwt !== null && iserId !== null) {
         setlocallStoreLogin(login)
         setlocallStoreJWT(jwt)
+        console.log(login, iserId)
+        dispatch(
+          userActions.login({
+            login: JSON.parse(login),
+            userId: JSON.parse(iserId),
+            jwt: JSON.parse(jwt),
+          })
+        )
       }
     } catch (error) {
       console.log(error)
