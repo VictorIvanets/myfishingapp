@@ -2,10 +2,12 @@ import { configureStore } from "@reduxjs/toolkit"
 import { saveState } from "./storage"
 import userSlice from "./login.slice"
 import { LOCAL_JWT, LOCAL_LOGIN, LOCAL_USERID } from "./constants"
+import locationSlice from "./location.slice"
 
 export const store = configureStore({
   reducer: {
     user: userSlice,
+    location: locationSlice,
   },
 })
 

@@ -12,7 +12,10 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   linkFoLogin: {
-    width: 120,
+    flex: 1,
+    padding: 15,
+    justifyContent: "space-between",
+    width: 150,
     height: 50,
   },
   linkFoLoginText: {

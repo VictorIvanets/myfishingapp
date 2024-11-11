@@ -7,6 +7,7 @@ import { styles } from "./styles.loginpage"
 import { userActions } from "@/store/login.slice"
 import { useDispatch } from "react-redux"
 import { AppDispath } from "@/store/store"
+import Preloader from "@/components/preloader/preloader"
 
 export default function LoginPage() {
   const [loginInput, setLoginInput] = useState("")
@@ -50,7 +51,6 @@ export default function LoginPage() {
         setErrorAuth(data.message)
         setIsLoading(false)
       } else {
-        console.log(data.login, data.userId)
         dispatch(
           userActions.login({
             login: data.login,
@@ -133,9 +133,7 @@ export default function LoginPage() {
         </View>
       ) : (
         <View style={styles.loading}>
-          <ThemedText type="title" style={styles.colorWhite}>
-            LOAD...
-          </ThemedText>
+          <Preloader />
         </View>
       )}
     </View>

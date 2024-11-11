@@ -6,7 +6,6 @@ const initialState: UserState = {
   login: null,
   userId: null,
 }
-console.log(initialState)
 
 export const userSlice = createSlice({
   name: "user",

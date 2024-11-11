@@ -12,6 +12,8 @@ import { userActions } from "@/store/login.slice"
 export default function StartPage() {
   const navigate = useNavigate()
   const { login, userId } = useSelector((s: RootState) => s.user)
+  const { latitude, longitude } = useSelector((s: RootState) => s.location)
+
   const dispatch = useDispatch<AppDispath>()
 
   return (
@@ -29,13 +31,20 @@ export default function StartPage() {
         <ThemedText type="subtitle" style={styles.linkFoLoginText}>
           START_PAGE
         </ThemedText>
-        {
-          <ThemedText type="subtitle" style={styles.linkFoLoginText}>
-            {login}
-          </ThemedText>
-        }
+
+        <ThemedText type="subtitle" style={styles.linkFoLoginText}>
+          {login}
+        </ThemedText>
+
         <ThemedText type="subtitle" style={styles.linkFoLoginText}>
           {userId}
+        </ThemedText>
+        <ThemedText type="subtitle" style={styles.linkFoLoginText}>
+          {latitude}
+        </ThemedText>
+
+        <ThemedText type="subtitle" style={styles.linkFoLoginText}>
+          {longitude}
         </ThemedText>
       </View>
       <Pressable

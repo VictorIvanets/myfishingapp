@@ -10,12 +10,13 @@ import { styles } from "./styles.loadpage"
 import { useDispatch } from "react-redux"
 import { AppDispath } from "@/store/store"
 import { userActions } from "@/store/login.slice"
+import locationSlice, { locationActions } from "@/store/location.slice"
 
 export default function LoadPage() {
   const [location, setLocation] = useState<Location.LocationObjectCoords>()
   const [errorMsg, setErrorMsg] = useState("")
-  const [locallStoreLogin, setlocallStoreLogin] = useState("")
-  const [locallStoreJWT, setlocallStoreJWT] = useState("")
+  const [locallStoreLogin, setlocallStoreLogin] = useState<string | null>(null)
+  const [locallStoreJWT, setlocallStoreJWT] = useState<string | null>(null)
   const dispatch = useDispatch<AppDispath>()
 
   const locallStoreGetData = async () => {
@@ -24,9 +25,9 @@ export default function LoadPage() {
       const jwt = await AsyncStorage.getItem(LOCAL_JWT)
       const iserId = await AsyncStorage.getItem(LOCAL_USERID)
       if (login !== null && jwt !== null && iserId !== null) {
-        setlocallStoreLogin(login)
-        setlocallStoreJWT(jwt)
-        console.log(login, iserId)
+        setlocallStoreLogin(JSON.parse(login))
+        setlocallStoreJWT(JSON.parse(jwt))
+
         dispatch(
           userActions.login({
             login: JSON.parse(login),
@@ -34,15 +35,14 @@ export default function LoadPage() {
             jwt: JSON.parse(jwt),
           })
         )
+      } else {
+        setlocallStoreLogin(null)
+        setlocallStoreJWT(null)
       }
     } catch (error) {
       console.log(error)
     }
   }
-
-  useEffect(() => {
-    locallStoreGetData()
-  }, [])
 
   const getLocation = async () => {
     try {
@@ -53,12 +53,19 @@ export default function LoadPage() {
       }
       const { coords } = await Location.getCurrentPositionAsync({})
       setLocation(coords)
+      dispatch(
+        locationActions.setCoords({
+          latitude: coords?.latitude,
+          longitude: coords?.longitude,
+        })
+      )
     } catch {
       Alert.alert("Не можу визначити локацію")
     }
   }
 
   useEffect(() => {
+    locallStoreGetData()
     getLocation()
   }, [])
 
@@ -86,19 +93,22 @@ export default function LoadPage() {
             {text}
           </ThemedText>
         ) : (
-          <View>
-            <ThemedText style={styles.colorWhite} type="default">
-              {location?.latitude}
-            </ThemedText>
-          </View>
+          <ThemedText style={styles.colorWhite} type="default"></ThemedText>
         )}
         <View style={styles.linkFoLogin}>
           {!locallStoreLogin && !locallStoreJWT ? (
-            <Link to="/login">
-              <ThemedText type="subtitle" style={styles.linkFoLoginText}>
-                ВХІД
-              </ThemedText>
-            </Link>
+            <>
+              <Link to="/login">
+                <ThemedText type="subtitle" style={styles.linkFoLoginText}>
+                  ВХІД
+                </ThemedText>
+              </Link>
+              <Link to="/register">
+                <ThemedText type="default" style={styles.linkFoLoginText}>
+                  РЕЄСТРАЦІЯ
+                </ThemedText>
+              </Link>
+            </>
           ) : (
             <Link to="/startpage">
               <ThemedText type="subtitle" style={styles.linkFoLoginText}>
